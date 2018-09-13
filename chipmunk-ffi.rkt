@@ -1,0 +1,196 @@
+#lang racket
+
+(provide cpv
+         cpVect-x
+         cpVect-y)
+
+(require ffi/unsafe
+         ffi/unsafe/define)
+
+(define chipmunk (ffi-lib "./libchipmunk"))
+(define-ffi-definer _define-chipmunk chipmunk)
+
+(define-syntax-rule (define-chipmunk i x ...)
+  (begin (provide i)
+         (_define-chipmunk i x ...)))
+
+(define-cstruct _cpVect
+  ([x _double]
+   [y _double]))
+
+
+(define _cpFloat _double)
+(define cpFloat? real?)
+(define _cpDataPointer _pointer)
+(define _size_t _ulong)
+(define _cpHashValue _size_t)
+(define _cpBool _int)
+(define cpTrue 1)
+(define cpFalse 0)
+(define _cpTimeStamp _uint)
+(define _cpCollisionType _uint)
+(define _cpGroup _uint)
+(define _cpLayers _uint)
+
+
+(define cpv make-cpVect)
+
+(define _cpBodyVelocityFunc
+  (_fun _pointer _cpVect _cpFloat _cpFloat -> _void))
+
+(define _cpBodyPositionFunc
+  (_fun _pointer _cpFloat -> _void))
+
+(define-cstruct _cpBody
+  (; Integration Functions
+   [velocity_func _cpBodyVelocityFunc]
+   [position_func _cpBodyPositionFunc]
+   ; Mass Properties
+   [m _cpFloat]
+   [m_inv _cpFloat]
+   [i _cpFloat]
+   [i_inv _cpFloat]
+   ; Positional Properties
+   [p _cpVect]
+   [v _cpVect]
+   [f _cpVect]
+   [a _cpFloat]
+   [w _cpFloat]
+   [t _cpFloat]
+   [rot _cpVect]
+   ; User Definable Fields
+   [data _cpDataPointer]
+   ; Internally Used Fields
+   [v_bias _cpVect]
+   [w_bias _cpFloat]))
+
+(define-cstruct _cpSpace
+  ([iterations _int]
+   [gravity _cpVect]
+   [damping _cpFloat]
+   [idleSpeedThreshold _cpFloat]
+   [sleepTimeThreshold _cpFloat]
+   [collisionSlop _cpFloat]
+   [collisionBias _cpFloat]
+   [collisionPersistence _cpFloat]
+   [enableContactGraph _cpBool]
+   [data _cpDataPointer]
+   [staticBody _cpBody-pointer]))
+
+(define-cstruct _cpBB
+  ([l _cpFloat]
+   [b _cpFloat]
+   [r _cpFloat]
+   [t _cpFloat]))
+
+
+(define-cstruct _cpShape
+  ([body _cpBody-pointer]
+   [bb _cpBB]
+   [sensor _cpBool]
+   [e _cpFloat]
+   [u _cpFloat]
+   [surface_v _cpVect]
+   [data _cpDataPointer]
+   [collision_type _cpCollisionType]
+   [group _cpGroup]
+   [layers _cpLayers]))
+
+
+
+
+(define-chipmunk cpSpaceNew
+  (_fun -> _cpSpace-pointer))
+
+
+(define-chipmunk cpSpaceSetGravity
+  (_fun _cpSpace-pointer _cpVect -> _void))
+
+
+(define-chipmunk cpSegmentShapeNew
+  (_fun _cpBody-pointer _cpVect _cpVect _cpFloat -> _cpShape-pointer))
+
+
+(define-chipmunk cpSpaceGetStaticBody
+  (_fun _cpSpace-pointer -> _cpBody-pointer))
+
+
+
+(define-chipmunk cpShapeSetFriction
+  (_fun _cpShape-pointer _cpFloat -> _void))
+
+
+
+(define-chipmunk cpSpaceAddShape
+  (_fun _cpSpace-pointer _cpShape-pointer -> _cpShape-pointer))
+
+
+(define-chipmunk cpMomentForCircle
+  (_fun _cpFloat _cpFloat _cpFloat _cpVect -> _cpFloat))
+
+
+(define-chipmunk cpMomentForBox
+  (_fun _cpFloat _cpFloat _cpFloat -> _cpFloat))
+
+
+(define-chipmunk cpSpaceAddBody
+  (_fun _cpSpace-pointer _cpBody-pointer -> _cpBody-pointer))
+
+
+(define-chipmunk cpBodyNew
+  (_fun _cpFloat _cpFloat -> _cpBody-pointer))
+
+
+(define-chipmunk cpBodySetPosition
+  (_fun _cpBody-pointer _cpVect -> _void))
+
+
+(define-chipmunk cpCircleShapeNew
+  (_fun _cpBody-pointer _cpFloat _cpVect -> _cpShape-pointer))
+
+(define-chipmunk cpBoxShapeNew
+  (_fun _cpBody-pointer _cpFloat _cpFloat _cpVect -> _cpShape-pointer ))
+
+
+(define-chipmunk cpBodyGetPosition
+  (_fun _cpBody-pointer -> _cpVect))
+
+
+(define-chipmunk cpBodySetVelocity
+  (_fun _cpBody-pointer _cpVect -> _cpVect))
+
+
+(define-chipmunk cpBodyGetVelocity
+  (_fun _cpBody-pointer -> _cpVect))
+
+;cpFloat 	cpBodyGetAngle (const cpBody *body)
+(define-chipmunk cpBodyGetAngle
+  (_fun _cpBody-pointer -> _cpFloat))
+
+
+(define-chipmunk cpSpaceStep
+  (_fun _cpSpace-pointer _cpFloat -> _void))
+
+
+(define-chipmunk cpShapeFree
+  (_fun _cpShape-pointer -> _void))
+
+
+(define-chipmunk cpBodyFree
+  (_fun _cpBody-pointer -> _void))
+
+
+(define-chipmunk cpSpaceFree
+  (_fun _cpSpace-pointer -> _void))
+
+
+
+
+
+
+
+
+
+
+
+
