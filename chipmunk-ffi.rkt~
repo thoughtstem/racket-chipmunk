@@ -1,9 +1,0 @@
-#lang racket
-
-(require ffi/unsafe
-         ffi/unsafe/define)
-
-(define chipmunk (ffi-lib "./libchipmunk"))
-(define-ffi-definer define-chipmunk chipmunk)
-
-

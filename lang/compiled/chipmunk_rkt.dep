@@ -1,0 +1,1 @@
+("7.0" ("aa7c035cacbf89a18004e5356e77386ee63b1027" . "f0eb9ee17952add2fd26e4c8bbd2a2b22df0b2c3") (collects #"racket" #"main.rkt") (collects #"racket" #"runtime-config.rkt") (collects #"racket-chipmunk" #"lang" #"chipmunk-ffi.rkt"))
