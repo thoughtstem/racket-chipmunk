@@ -6,7 +6,31 @@
          cpBB-l
          cpBB-r
          cpBB-t
-         cpBB-b)
+         cpBB-b
+
+         cpShape-e
+         cpShape-u
+         set-cpShape-e!
+         set-cpShape-u!
+         
+         set-cpShape-group!
+
+         cpBody-velocity_func
+         set-cpBody-velocity_func!
+         set-cpBody-p!
+
+         _cpFloat
+         _cpVect
+
+         set-cpBody-data!
+         set-cpShape-data!
+
+         set-cpCollisionHandler-cpCollisionBeginFunc!
+         set-cpCollisionHandler-cpCollisionPreSolveFunc!
+         set-cpCollisionHandler-cpCollisionPostSolveFunc!
+         set-cpCollisionHandler-cpCollisionSeparateFunc!
+
+         current-cpBody)
 
 (require ffi/unsafe
          ffi/unsafe/define)
@@ -45,8 +69,17 @@
    (real->double-flonum x)
    (real->double-flonum y)))
 
-(define _cpBodyVelocityFunc
+#;(define _cpBodyVelocityFunc
   (_fun _pointer _cpVect _cpFloat _cpFloat -> _void))
+
+
+(define callbacks (make-weak-hasheq))
+(define current-cpBody (make-parameter #f))
+
+(define _cpBodyVelocityFunc
+  (_fun #:keep (lambda (cb) (hash-set! callbacks (current-cpBody) cb))
+        _pointer _cpVect _cpFloat _cpFloat -> _void))
+
 
 (define _cpBodyPositionFunc
   (_fun _pointer _cpFloat -> _void))
@@ -134,6 +167,9 @@
 (define-chipmunk cpSpaceAddShape
   (_fun _cpSpace-pointer _cpShape-pointer -> _cpShape-pointer))
 
+(define-chipmunk cpSpaceRemoveShape
+  (_fun _cpSpace-pointer _cpShape-pointer -> _void))
+
 
 (define-chipmunk cpMomentForCircle
   (_fun _cpFloat _cpFloat _cpFloat _cpVect -> _cpFloat))
@@ -146,11 +182,17 @@
 (define-chipmunk cpSpaceAddBody
   (_fun _cpSpace-pointer _cpBody-pointer -> _cpBody-pointer))
 
+(define-chipmunk cpSpaceRemoveBody
+  (_fun _cpSpace-pointer _cpBody-pointer -> _void))
+
 
 (define-chipmunk cpBodyNew
   (_fun _cpFloat _cpFloat -> _cpBody-pointer))
 
 (define-chipmunk cpBodyNewKinematic
+  (_fun -> _cpBody-pointer))
+
+(define-chipmunk cpBodyNewStatic
   (_fun -> _cpBody-pointer))
 
 (define-chipmunk cpBodySetPosition
@@ -179,8 +221,23 @@
   (_fun _cpBody-pointer -> _cpVect))
 
 
+;cpFloat 	cpBodyGetAngularVelocity (const cpBody *body)
+(define-chipmunk cpBodyGetAngularVelocity
+  (_fun _cpBody-pointer -> _cpFloat))
+
+
+;cpBodySetAngularVelocity (cpBody *body, cpFloat angularVelocity)
+(define-chipmunk cpBodySetAngularVelocity
+  (_fun _cpBody-pointer _cpFloat -> _void))
+
+
+
 (define-chipmunk cpBodyGetAngle
   (_fun _cpBody-pointer -> _cpFloat))
+
+;void 	cpBodySetAngle (cpBody *body, cpFloat a)
+(define-chipmunk cpBodySetAngle
+  (_fun _cpBody-pointer _cpFloat -> _void))
 
 
 (define-chipmunk cpSpaceStep
@@ -200,12 +257,99 @@
 
 
 
+;void 	cpBodyUpdateVelocity (cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
+(define-chipmunk cpBodyUpdateVelocity
+  (_fun _cpBody-pointer _cpVect _cpFloat _cpFloat -> _void))
 
 
 
 
 
 
+(define-cstruct _cpArbiter
+  (
+   ; Calculated value to use for the elasticity coefficient.
+   ; Override in a pre-solve collision handler for custom behavior.
+   [e _cpFloat]
+   ; Calculated value to use for the friction coefficient.
+   ; Override in a pre-solve collision handler for custom behavior.
+   [u _cpFloat]
+   ; Calculated value to use for applying surface velocities.
+   ; Override in a pre-solve collision handler for custom behavior.
+   [surface_vr _cpVect]))
+
+(define _cpCollisionBeginFunc
+  (_fun _cpArbiter-pointer
+        _cpSpace-pointer
+        _pointer
+        -> _cpBool))
+; Definitoin of 'Collision pre-solve event function callback type'.
+(define _cpCollisionPreSolveFunc
+  (_fun _cpArbiter-pointer
+        _cpSpace-pointer
+        _pointer
+        -> _cpBool))
+; Definition of 'Collision post-solve event function callback type'.
+(define _cpCollisionPostSolveFunc
+  (_fun _cpArbiter-pointer
+        _cpSpace-pointer
+        _pointer
+        -> _void))
+; Definition of 'Collision separate event function callback type'.
+(define _cpCollisionSeparateFunc
+  (_fun _cpArbiter-pointer
+        _cpSpace-pointer
+        _pointer
+        -> _void))
+
+
+(define-cstruct _cpCollisionHandler 
+  (
+   [typeA _cpCollisionType]
+   [typeB _cpCollisionType]
+   [cpCollisionBeginFunc _cpCollisionBeginFunc]
+   [cpCollisionPreSolveFunc _cpCollisionPreSolveFunc]
+   [cpCollisionPostSolveFunc _cpCollisionPostSolveFunc]
+   [cpCollisionSeparateFunc _cpCollisionSeparateFunc]
+   [cpDataPointer _cpDataPointer]))
 
 
 
+
+(define-chipmunk cpSpaceAddDefaultCollisionHandler
+  (_fun _cpSpace-pointer
+        -> _cpCollisionHandler-pointer))
+ 
+
+(define-chipmunk cpBodySetUserData
+  (_fun _cpBody-pointer _cpDataPointer -> _void))
+
+(define-chipmunk cpShapeSetUserData
+  (_fun _cpShape-pointer _cpDataPointer -> _void))
+
+(define-chipmunk cpSpaceSetUserData
+  (_fun _cpSpace-pointer _cpDataPointer -> _void))
+
+
+
+
+(define-chipmunk cpArbiterGetShapes
+  (_fun _cpArbiter-pointer
+        (out1 : (_ptr o _cpShape-pointer))
+        (out2 : (_ptr o _cpShape-pointer))
+        -> _void
+        -> (values out1 out2)))
+
+(define-chipmunk cpShapeGetUserData
+  (_fun _cpShape-pointer -> _cpDataPointer))
+
+
+
+
+
+
+(define-chipmunk cpShapeDestroy
+  (_fun _cpShape-pointer -> _void))
+
+(define-chipmunk cpBodyDestroy
+  (_fun _cpBody-pointer -> _void))

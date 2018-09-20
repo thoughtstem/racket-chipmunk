@@ -18,6 +18,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+#include <stdio.h>
  
 #include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDemo.h"
@@ -54,6 +56,7 @@ SelectPlayerGroundNormal(cpBody *body, cpArbiter *arb, cpVect *groundNormal){
 static void
 playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 {
+  /*
 	int jumpState = (ChipmunkDemoKeyboard.y > 0.0f);
 	
 	// Grab the grounding normal from last frame
@@ -84,6 +87,9 @@ playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 	}
 	
 	body->v.y = cpfclamp(body->v.y, -FALL_VELOCITY, INFINITY);
+        */
+
+	cpBodySetVelocity(body, cpv(PLAYER_VELOCITY*ChipmunkDemoKeyboard.x,PLAYER_VELOCITY*ChipmunkDemoKeyboard.y));
 }
 
 static void
@@ -104,6 +110,8 @@ update(cpSpace *space, double dt)
 	
 	remainingBoost -= dt;
 	lastJumpState = jumpState;
+
+        //playerUpdateVelocity(playerBody, cpv(0.0f,0.0f), 0.0, 0.0);
 }
 
 static cpSpace *
@@ -112,50 +120,28 @@ init(void)
 	cpSpace *space = cpSpaceNew();
 	space->iterations = 10;
 	space->gravity = cpv(0, -GRAVITY);
-//	space->sleepTimeThreshold = 1000;
 
 	cpBody *body, *staticBody = cpSpaceGetStaticBody(space);
 	cpShape *shape;
 	
-	// Create segments around the edge of the screen.
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
-
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
-
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
-	
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
-	
-	// Set up the player
 	body = cpSpaceAddBody(space, cpBodyNew(1.0f, INFINITY));
 	body->p = cpv(0, -200);
 	body->velocity_func = playerUpdateVelocity;
 	playerBody = body;
 
 	shape = cpSpaceAddShape(space, cpBoxShapeNew2(body, cpBBNew(-15.0, -27.5, 15.0, 27.5), 10.0));
-//	shape = cpSpaceAddShape(space, cpSegmentShapeNew(playerBody, cpvzero, cpv(0, radius), radius));
+//	shape = cpSpaceAddShape(space, cpSegmentShapeNew(playerBody, cpvzero, cpv(0, 10.0), 10.0));
 	shape->e = 0.0f; shape->u = 0.0f;
 	shape->type = 1;
 	playerShape = shape;
 	
-	// Add some boxes to jump on
-	for(int i=0; i<6; i++){
-		for(int j=0; j<3; j++){
-			body = cpSpaceAddBody(space, cpBodyNew(4.0f, INFINITY));
-			body->p = cpv(100 + j*60, -200 + i*60);
-			
-			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 50, 50, 0.0));
-			shape->e = 0.0f; shape->u = 0.7f;
-		}
-	}
+        body = cpBodyNewKinematic();
+        body->p = cpv(100 + 60, -200 + 60);
+        cpSpaceAddBody(space, body);//cpBodyNew(4.0f, INFINITY));
+        
+        shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 50, 50, 0.0));
+        shape->e = 0.0f; 
+        shape->u = 0.7f;
 	
 	return space;
 }

@@ -1,5 +1,169 @@
 #lang racket
 
-(provide (all-from-out "./chipmunk-ffi.rkt"))
+(provide step-chipmunk
+         angle
+         box 
+         box-kinematic
+         box-static
+         *space
+         x y w h
+         (struct-out chipmunk) 
+         set-velocity 
+         destroy-chipmunk
+         ) 
+
+(require ffi/unsafe) 
+  
+(provide (all-from-out "./chipmunk-ffi.rkt"))   
 
 (require "./chipmunk-ffi.rkt")
+ 
+(define *gravity
+  (cpv 0.0 0.0))  
+  
+
+(struct chipmunk (id body shape meta w h) #:transparent)
+  
+(define (angle c) 
+  (cpBodyGetAngle (chipmunk-body c)))
+
+(define (x c)
+  (define p (cpBodyGetPosition (chipmunk-body c)))
+  (cpVect-x p))
+
+(define (y c)
+  (define p (cpBodyGetPosition (chipmunk-body c)))
+  (cpVect-y p))
+
+(define (w c)
+  (define bb (cpShapeGetBB (chipmunk-shape c)))
+
+  (chipmunk-w c))
+
+(define (h c)
+  (define bb (cpShapeGetBB (chipmunk-shape c)))
+
+  (chipmunk-h c))
+
+
+
+(define *space
+  (cpSpaceNew))
+
+(cpSpaceSetGravity *space *gravity)
+
+(define (box w h v
+             #:mass (mass 1.0)
+             #:friction (friction 0.7)
+             #:meta (meta #f)
+             #:user-data (user-data #f)
+             #:group (group 0))
+
+  #;(define boxMoment
+      (cpMomentForBox (real->double-flonum mass) 0.0 (real->double-flonum h)))
+  
+  (define body (cpSpaceAddBody *space (cpBodyNew (real->double-flonum mass) +inf.0 #;boxMoment)))
+
+
+  
+  (define shape (cpSpaceAddShape *space (cpBoxShapeNew body
+                                                       (real->double-flonum w)
+                                                       (real->double-flonum h)
+                                                       (cpv 0.0 0.0))))
+
+  #;(and user-data
+       (displayln "Setting Data!")
+       (displayln (ptr-ref user-data _uint)))
+
+  (and user-data
+       (cpBodySetUserData body user-data))
+
+  (and user-data
+       (cpShapeSetUserData shape user-data))
+
+  (set-cpShape-group! shape group)
+
+  (set-cpShape-e! shape 0.0)
+  (set-cpShape-u! shape 0.0)
+  
+  (cpBodySetPosition body v)
+  (cpShapeSetFriction shape friction)
+  (chipmunk (random 100000) body shape meta w h))
+
+
+;cpBodyNewKinematic 
+(define (box-kinematic w h v
+                       #:friction (friction 0.7)
+                       #:meta (meta #f)
+                       #:user-data (user-data #f)
+                       #:group (group 0))
+  (define body (cpSpaceAddBody *space (cpBodyNewKinematic)))
+
+  
+  (define shape (cpSpaceAddShape *space (cpBoxShapeNew body
+                                                       (real->double-flonum w)
+                                                       (real->double-flonum h)
+                                                       (cpv 0.0 0.0))))
+  #;(and user-data
+       (displayln "Setting Data!")
+       (displayln (ptr-ref user-data _uint)))
+  
+  (and user-data
+       (cpBodySetUserData body user-data))
+
+  (and user-data
+       (cpShapeSetUserData shape user-data))
+  
+  (set-cpShape-group! shape group)
+
+  (set-cpShape-e! shape 0.0)
+  (set-cpShape-u! shape 0.0)
+  
+  (cpBodySetPosition body v)
+  (cpShapeSetFriction shape friction)
+  (chipmunk (random 100000) body shape meta w h))
+
+(define (box-static w h v
+                       #:friction (friction 0.7)
+                       #:meta (meta #f))
+  (define body (cpSpaceAddBody *space (cpBodyNewStatic)))
+  
+  (define shape (cpSpaceAddShape *space (cpBoxShapeNew body
+                                                       (real->double-flonum w)
+                                                       (real->double-flonum h)
+                                                       (cpv 0.0 0.0))))
+  
+  (set-cpShape-e! shape 0.0)
+  (set-cpShape-u! shape 0.0)
+
+  
+  (cpBodySetPosition body v)
+  (cpShapeSetFriction shape friction)
+  (chipmunk (random 100000) body shape meta w h))
+
+
+(define (set-velocity c v)
+  (cpBodySetVelocity (chipmunk-body c)
+                     v))
+
+(define (step-chipmunk rate)
+  (cpSpaceStep *space rate))
+
+
+(define (destroy-chipmunk c)
+  (displayln "Destroying a chipmunk... Right??")
+  
+  (cpSpaceRemoveBody *space (chipmunk-body c))
+  (cpBodyDestroy (chipmunk-body c))
+  #;(cpBodyFree    (chipmunk-body c))
+
+  (cpSpaceRemoveShape *space (chipmunk-shape c))
+  (cpShapeDestroy (chipmunk-shape c))
+  #;(cpShapeFree    (chipmunk-shape c))
+
+  (struct-copy chipmunk c
+               [body #f]
+               [shape #f]))
+
+ 
+
