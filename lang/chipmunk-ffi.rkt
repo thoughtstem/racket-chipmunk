@@ -344,7 +344,8 @@
   (_fun _cpShape-pointer -> _cpDataPointer))
 
 
-
+(define-chipmunk cpBodyGetUserData
+  (_fun _cpBody-pointer -> _cpDataPointer))
 
 
 
