@@ -3,7 +3,7 @@
 (require 2htdp/image
          lang/posn)
 (require 2htdp/universe)
-(require "../main/lang.rkt")
+(require racket-chipmunk)
 
 
 (define *gravity
@@ -30,8 +30,6 @@
 (define moment
   (cpMomentForCircle mass 0.0 radius (cpv 0.0 0.0)))
 
-(define boxMoment
-  (cpMomentForBox mass 0.0 radius ))
 
 (define (new-ball v)
   (define body (cpSpaceAddBody *space (cpBodyNew mass moment)))
@@ -40,12 +38,13 @@
   (cpShapeSetFriction shape 0.7)
   body)
 
+(define boxMoment
+  (cpMomentForBox mass 0.0 radius ))
+
 (define *boxBody
-  (cpSpaceAddBody *space (cpBodyNew mass moment)))
+  (cpSpaceAddBody *space (cpBodyNew mass boxMoment)))
 
 (cpBodySetPosition *boxBody   (cpv 60.0 12.0))
-
-
 
 (define *boxShape
   (cpSpaceAddShape *space (cpBoxShapeNew *boxBody radius radius (cpv 0.0 0.0))))

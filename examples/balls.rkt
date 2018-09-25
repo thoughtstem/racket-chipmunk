@@ -5,171 +5,69 @@
 (require 2htdp/universe)
 (require racket-chipmunk)
 
+(begin
 
-(define *gravity
-  (cpv 0.0 100.0))
+  (define ground
+    (box-kinematic 25 100 25 5 
+                   #:meta 'black))
 
-(define *space
-  (cpSpaceNew))
+  (define ground2
+    (box-kinematic 50 100 25 5 
+                   #:meta 'gray))
 
-(cpSpaceSetGravity *space *gravity)
+  (set-velocity-function! ground (λ(chipmunk gravity damping dt)
+                                   (set-velocity! chipmunk 0 -10)))
 
-(define *ground-start* (cpv 40.0 85.0))
-(define *ground-end* (cpv 80.0 95.0))
-
-(define *ground
-  (cpSegmentShapeNew (cpSpaceGetStaticBody *space) *ground-start* *ground-end* 0.0))
-
-(cpShapeSetFriction *ground 1.0)
-
-(void (cpSpaceAddShape *space *ground))
-
-(define radius 2.5)
-(define mass 1.0)
-
-(define moment
-  (cpMomentForCircle mass 0.0 radius (cpv 0.0 0.0)))
+  (set-velocity-function! ground2 (λ(chipmunk gravity damping dt)
+                                    (set-velocity! chipmunk 0 -5)))
 
 
-(define (new-ball v)
-  (define body (cpSpaceAddBody *space (cpBodyNew mass moment)))
-  (define shape (cpSpaceAddShape *space (cpCircleShapeNew body radius (cpv 0.0 0.0))))
-  (cpBodySetPosition body v)
-  (cpShapeSetFriction shape 0.7)
-  body)
+  (define boxes
+    (list
+     (box  60.0 22.0 3 3 #:meta 'green)
+     (box  61.0 21.0 3 3 #:meta 'blue)
+     (box  62.0 20.0 3 3
+           #:meta 'yellow)
+     (box  63.0 16.0 3 3) ; #:user-data 42)
+     (box  63.0 17.0 3 3)
+     (box  63.0 18.0 3 3)
+     (box  63.0 19.0 3 3)
+     (box  63.0 70.0 3 3 #:meta 'orange)
+     ground
+     ground2))
 
-(define boxMoment
-  (cpMomentForBox mass 0.0 radius ))
+  (define (on-collide c1 c2)
+    #;(displayln (list c1 c2))
+    #t)
 
-(define *boxBody
-  (cpSpaceAddBody *space (cpBodyNew mass boxMoment)))
+  (set-presolve! (lambda(c1 c2)
+                   (displayln (map get-data (list c1 c2)))))
 
-(cpBodySetPosition *boxBody   (cpv 60.0 12.0))
+  (define *tick-rate* (/ 1 120.0))
+  (define *canvas* (square 100 'solid 'white))
 
-(define *boxShape
-  (cpSpaceAddShape *space (cpBoxShapeNew *boxBody radius radius (cpv 0.0 0.0))))
+  (define (box->color b)
+    (or (chipmunk-meta b) 'red))
 
+  (define (render-box b)
+    (rotate (* -57.29 (angle b))
+            (rectangle (w b) (h b) 'solid (box->color b))))
 
-(define balls
-  (list
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
+  (define (box->posn b)
+    (make-posn (x b)
+               (y b)))
 
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))
-    (new-ball (cpv 60.0 15.0))))
-
-(define boxes
-  (list
-   *boxBody))
-
-
-
-(define *tick-rate* (/ 1 120.0))
-(define *canvas* (empty-scene 100.0 100.0))
-
-(define (render-ball b)
-  (circle radius 'solid 'blue))
-
-(define (render-box b)
-  (rotate (cpBodyGetAngle b)
-          (square radius 'solid 'orange)))
-
-(define (ball->posn b)
-  (define p (cpBodyGetPosition b))
-  (make-posn (cpVect-x p)
-             (cpVect-y p)))
-
-(define box->posn ball->posn)
-
-
-(big-bang
- 0
- [on-tick (lambda (state)
-            (cpSpaceStep *space *tick-rate*)
-            (+ state 1))
-          *tick-rate*]
- [on-draw (lambda (state)
-            
-            (scale 6
-                   (add-line
-                    (place-images
-                     (append
-                      (map render-ball balls)
-                      (map render-box boxes))
-                     (append
-                      (map ball->posn balls)
-                      (map box->posn boxes))
-                     *canvas*)
-                    (cpVect-x *ground-start*)
-                    (cpVect-y *ground-start*)
-                    (cpVect-x *ground-end*)
-                    (cpVect-y *ground-end*)
-                    'green)))])
-
-
-#;(cpShapeFree *ballShape)
-#;(cpBodyFree *ballBody)
-
-
-(cpShapeFree *ground)
-(cpSpaceFree *space)
-
-
+  (big-bang
+      0
+    [on-tick (lambda (state)
+               (step-chipmunk *tick-rate*)
+               (+ state 1))
+             *tick-rate*]
+    [on-draw (lambda (state)
+               (scale 6
+                      (place-images
+                       (map render-box boxes)
+                       (map box->posn boxes)
+                       *canvas*)))]))
 
 
