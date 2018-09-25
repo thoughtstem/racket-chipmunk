@@ -1,0 +1,25 @@
+dependencies: /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/src/cpArray.c \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/chipmunk_private.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/chipmunk.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/chipmunk_types.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpVect.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpBB.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpTransform.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpSpatialIndex.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpArbiter.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpBody.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpShape.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpPolyShape.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpConstraint.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpPinJoint.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpSlideJoint.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpPivotJoint.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpGrooveJoint.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpDampedSpring.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpDampedRotarySpring.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpRotaryLimitJoint.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpRatchetJoint.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpGearJoint.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpSimpleMotor.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/cpSpace.h \
+  /Users/thoughtstem/Dev/Physics/Chipmunk-7.0.2/xcode/../include/chipmunk/chipmunk_structs.h
