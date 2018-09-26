@@ -195,9 +195,6 @@
 (define-chipmunk cpBodyNewStatic
   (_fun -> _cpBody-pointer))
 
-(define-chipmunk cpBodySetPosition
-  (_fun _cpBody-pointer _cpVect -> _void))
-
 
 (define-chipmunk cpCircleShapeNew
   (_fun _cpBody-pointer _cpFloat _cpVect -> _cpShape-pointer))
@@ -214,7 +211,12 @@
 
 
 (define-chipmunk cpBodySetVelocity
-  (_fun _cpBody-pointer _cpVect -> _cpVect))
+  (_fun _cpBody-pointer _cpVect -> _void))
+
+
+(define-chipmunk cpBodySetPosition
+  (_fun _cpBody-pointer _cpVect -> _void))
+
 
 
 (define-chipmunk cpBodyGetVelocity
