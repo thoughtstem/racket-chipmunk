@@ -20,7 +20,7 @@
 
 (require ffi/unsafe) 
   
-#;(provide (all-from-out "./chipmunk-ffi.rkt"))   
+(provide (all-from-out "./chipmunk-ffi.rkt"))   
 
 (require "./chipmunk-ffi.rkt")
 
@@ -242,6 +242,7 @@
 
 
 (define (set-velocity! c x y)
+  #;(displayln (chipmunk-body c))
   (cpBodySetVelocity (chipmunk-body c)
                      (cpv x y)))
 
@@ -262,11 +263,11 @@
   
   (cpSpaceRemoveBody *space (chipmunk-body c))
   (cpBodyDestroy (chipmunk-body c))
-  (cpBodyFree    (chipmunk-body c))
+  #;(cpBodyFree    (chipmunk-body c))
 
   (cpSpaceRemoveShape *space (chipmunk-shape c))
   (cpShapeDestroy (chipmunk-shape c))
-  (cpShapeFree    (chipmunk-shape c))
+  #;(cpShapeFree    (chipmunk-shape c))
 
 
 
@@ -300,6 +301,7 @@
                           d)))
 
       ;(cpBodyUpdateVelocity body gravity damping dt)
+      ;(cpBodySetVelocity body gravity)
 
       (and chipmunk
            (f chipmunk
