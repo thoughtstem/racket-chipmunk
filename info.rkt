@@ -6,3 +6,5 @@
 #;(define scribblings '(("game-engine.scrbl" ())))
 
 #;(define deps '())
+(define deps (list 
+                   "base"))
