@@ -38,7 +38,7 @@
 (require racket/runtime-path)
 (define-runtime-path bin-dir "./binaries/")
 
-(define chipmunk (ffi-lib (~a bin-dir "libchipmunk")))
+(define chipmunk (ffi-lib (~a bin-dir "libchipmunk-release")))
 (define-ffi-definer _define-chipmunk chipmunk)
 
 (define-syntax-rule (define-chipmunk i x ...)
