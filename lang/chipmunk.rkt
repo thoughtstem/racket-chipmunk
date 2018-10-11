@@ -251,7 +251,7 @@
 
 
 (define (destroy-chipmunk c)
-  (displayln (~a "Destroying chipmunk... "
+  #;(displayln (~a "Destroying chipmunk... "
                  (map get-data
                       (filter (λ(x)
                                 (= (get-data x)
