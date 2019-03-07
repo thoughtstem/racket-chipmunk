@@ -11,11 +11,15 @@
          set-velocity! 
          destroy-chipmunk
          set-presolve!
+         set-separate!
+         set-begin!
+         set-postsolve!
 
          get-data
          set-velocity-function!
          set-chipmunk-posn!
          destroyed-chipmunk?
+         body->data
          )  
 
 (require ffi/unsafe) 
@@ -46,11 +50,49 @@
 
 (cpSpaceSetGravity *space *gravity)
 
+(define handler
+  (cpSpaceAddDefaultCollisionHandler *space))
+
+
+
+
+
+(define begin-f #f)
+(define (set-begin! f)
+  (set! begin-f f))
+(define (main-begin arbiter space data)
+  (let-values ([(s1 s2) (cpArbiterGetShapes arbiter)])
+
+    
+    ;NOTE: This is a good spot to optimize.  Lots of looping through all chipmunks on every frame...
+    ;  Index by user data or something...
+    (define c1 (findf (curry has-shape? s1) all-chipmunks))
+    (define c2 (findf (curry has-shape? s2) all-chipmunks))
+
+    (and (not c1)
+         (displayln "Found a null shape"))
+
+    (and (not c2)
+         (displayln "Found a null shape2"))
+    
+    (if (and c1
+             c2
+             begin-f
+             (begin-f c1 c2))
+        1
+        0)))
+
+
+
+
+
 
 (define presolve-f #f)
+(define (set-presolve! f)
+  (set! presolve-f f))
 (define (main-presolve arbiter space data)
   (let-values ([(s1 s2) (cpArbiterGetShapes arbiter)])
-    
+
     ;NOTE: This is a good spot to optimize.  Lots of looping through all chipmunks on every frame...
     ;  Index by user data or something...
     (define c1 (findf (curry has-shape? s1) all-chipmunks))
@@ -69,10 +111,59 @@
         1
         0)))
 
-(define handler
-  (cpSpaceAddDefaultCollisionHandler *space))
+(define separate-f #f)
+(define (set-separate! f)
+  (set! separate-f f))
+(define (main-separate arbiter space data)
+  (let-values ([(s1 s2) (cpArbiterGetShapes arbiter)])
+    
+    ;NOTE: This is a good spot to optimize.  Lots of looping through all chipmunks on every frame...
+    ;  Index by user data or something...
+    (define c1 (findf (curry has-shape? s1) all-chipmunks))
+    (define c2 (findf (curry has-shape? s2) all-chipmunks))
 
+    (and (not c1)
+         (displayln "Found a null shape"))
+
+    (and (not c2)
+         (displayln "Found a null shape2"))
+    
+    (if (and c1
+             c2
+             separate-f
+             (separate-f c1 c2))
+        1
+        0)))
+
+(define postsolve-f #f)
+(define (set-postsolve! f)
+  (set! postsolve-f f))
+(define (main-postsolve arbiter space data)
+  (let-values ([(s1 s2) (cpArbiterGetShapes arbiter)])
+    
+    ;NOTE: This is a good spot to optimize.  Lots of looping through all chipmunks on every frame...
+    ;  Index by user data or something...
+    (define c1 (findf (curry has-shape? s1) all-chipmunks))
+    (define c2 (findf (curry has-shape? s2) all-chipmunks))
+
+    (and (not c1)
+         (displayln "Found a null shape"))
+
+    (and (not c2)
+         (displayln "Found a null shape2"))
+    
+    (if (and c1
+             c2
+             postsolve-f
+             (postsolve-f c1 c2))
+        1
+        0)))
+
+
+(set-cpCollisionHandler-cpCollisionBeginFunc!    handler main-begin)
 (set-cpCollisionHandler-cpCollisionPreSolveFunc! handler main-presolve)
+(set-cpCollisionHandler-cpCollisionPostSolveFunc! handler main-postsolve)
+(set-cpCollisionHandler-cpCollisionSeparateFunc! handler main-separate)
 
 
 
@@ -147,8 +238,7 @@
 
 
 
-(define (set-presolve! f)
-  (set! presolve-f f))
+
 
 (define (number->pointer n)
   (define entity-id-ptr
@@ -330,7 +420,11 @@
        (error "Tried to set a position of a destroyed chipmunk.  You want segfaults?  Cuz that's how you get segfaults."))
   
   (cpBodySetPosition (chipmunk-body c)
-                     (cpv x y)))
+                     (cpv x y))
+  (cpSpaceReindexShapesForBody *space
+                               (chipmunk-body c))
+                               
+  )
 
 
 

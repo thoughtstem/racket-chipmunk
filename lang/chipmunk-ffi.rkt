@@ -356,3 +356,7 @@
 
 (define-chipmunk cpBodyDestroy
   (_fun _cpBody-pointer -> _void))
+
+(define-chipmunk cpSpaceReindexShapesForBody
+  (_fun _cpSpace-pointer _cpBody-pointer -> _void))
+        
