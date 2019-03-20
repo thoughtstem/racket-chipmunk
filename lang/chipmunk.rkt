@@ -160,9 +160,9 @@
         0)))
 
 
-(set-cpCollisionHandler-cpCollisionBeginFunc!    handler main-begin)
+;(set-cpCollisionHandler-cpCollisionBeginFunc!    handler main-begin)
 (set-cpCollisionHandler-cpCollisionPreSolveFunc! handler main-presolve)
-(set-cpCollisionHandler-cpCollisionPostSolveFunc! handler main-postsolve)
+;(set-cpCollisionHandler-cpCollisionPostSolveFunc! handler main-postsolve)
 (set-cpCollisionHandler-cpCollisionSeparateFunc! handler main-separate)
 
 
