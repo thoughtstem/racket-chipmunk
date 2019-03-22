@@ -6,4 +6,6 @@
 
 (define deps (list "base"))
 (define compile-omit-paths '("lang/binaries"
-                             "examples"))
+                             "examples"
+                             "Chipmunk"
+                             ))
