@@ -1,1 +1,0 @@
-("7.0" ("0b28620f8bda8be8434ec255831e613e2fb6f1c5" . "0de02db939016fe8ef28676ef89825af1abc5ae2") (collects #"errortrace" #"errortrace-key.rkt") (collects #"ffi" #"unsafe.rkt") (collects #"racket" #"main.rkt") (collects #"racket" #"runtime-config.rkt") (collects #"racket-chipmunk" #"lang" #"chipmunk-ffi.rkt"))
