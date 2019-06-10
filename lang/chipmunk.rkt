@@ -346,6 +346,7 @@
   (and (destroyed-chipmunk? c)
        (error "Do not destroy chipmunks twice!  I just saved you from a segfault.  You're welcome."))
   
+  #;
   (displayln (~a "Destroying chipmunk... "
                  (map get-data
                       (filter (λ(x)
