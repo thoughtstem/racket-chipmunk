@@ -316,6 +316,7 @@
   (define v (cpv x y))
   
   (define body (cpSpaceAddBody *space (cpBodyNewStatic)))
+  (cpBodySetPosition body v)
   
   (define shape (cpSpaceAddShape *space (cpBoxShapeNew body
                                                        (real->double-flonum w)
@@ -326,8 +327,8 @@
   (set-cpShape-u! shape 0.0)
 
   
-  (cpBodySetPosition body v)
   (cpShapeSetFriction shape friction)
+
   (chipmunk (random 100000) body shape meta w h))
 
 
