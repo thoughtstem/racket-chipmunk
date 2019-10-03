@@ -55,11 +55,16 @@
 (define _cpDataPointer _pointer)
 (define _size_t _ulong)
 (define _cpHashValue _size_t)
-(define _cpBool _int)
+(define _cpBool _int) 
 (define cpTrue 1)
 (define cpFalse 0)
 (define _cpTimeStamp _uint)
-(define _cpCollisionType _uint)
+
+;mflatt's suggestion from https://github.com/slembcke/Chipmunk2D/issues/183
+(define _cpCollisionType _uintptr)
+;(define _cpCollisionType _uint)
+
+
 (define _cpGroup _uint)
 (define _cpLayers _uint)
 
@@ -69,7 +74,8 @@
    (real->double-flonum x)
    (real->double-flonum y)))
 
-#;(define _cpBodyVelocityFunc
+#;
+(define _cpBodyVelocityFunc
   (_fun _pointer _cpVect _cpFloat _cpFloat -> _void))
 
 
@@ -162,6 +168,13 @@
 (define-chipmunk cpShapeSetFriction
   (_fun _cpShape-pointer _cpFloat -> _void))
 
+;cpCollisionType cpShapeGetCollisionType(const cpShape *shape)
+(define-chipmunk cpShapeGetCollisionType
+  (_fun _cpShape-pointer -> _cpCollisionType))
+
+;void cpShapeSetCollisionType(cpShape *shape, cpCollisionType value)
+(define-chipmunk cpShapeSetCollisionType
+  (_fun _cpShape-pointer _cpCollisionType -> _void) )
 
 
 (define-chipmunk cpSpaceAddShape
@@ -213,6 +226,10 @@
 (define-chipmunk cpBodySetVelocity
   (_fun _cpBody-pointer _cpVect -> _void))
 
+(define-chipmunk cpBodySetForce
+  (_fun _cpBody-pointer _cpVect -> _void))
+
+
 
 (define-chipmunk cpBodySetPosition
   (_fun _cpBody-pointer _cpVect -> _void))
@@ -220,6 +237,9 @@
 
 
 (define-chipmunk cpBodyGetVelocity
+  (_fun _cpBody-pointer -> _cpVect))
+
+(define-chipmunk cpBodyGetForce
   (_fun _cpBody-pointer -> _cpVect))
 
 
@@ -245,6 +265,8 @@
 (define-chipmunk cpSpaceStep
   (_fun _cpSpace-pointer _cpFloat -> _void))
 
+(define-chipmunk cpShapeSetSensor
+  (_fun _cpShape-pointer _cpBool -> _void))
 
 (define-chipmunk cpShapeFree
   (_fun _cpShape-pointer -> _void))
@@ -285,35 +307,50 @@
         _cpSpace-pointer
         _pointer
         -> _cpBool))
-; Definitoin of 'Collision pre-solve event function callback type'.
+
 (define _cpCollisionPreSolveFunc
   (_fun _cpArbiter-pointer
         _cpSpace-pointer
         _pointer
         -> _cpBool))
-; Definition of 'Collision post-solve event function callback type'.
+
 (define _cpCollisionPostSolveFunc
   (_fun _cpArbiter-pointer
         _cpSpace-pointer
         _pointer
-        -> _void))
-; Definition of 'Collision separate event function callback type'.
+        -> _cpBool
+
+        ;Docs say it should be void, but that doesn't seem to work...
+       ; _void
+        
+        ))
+
 (define _cpCollisionSeparateFunc
   (_fun _cpArbiter-pointer
         _cpSpace-pointer
         _pointer
-        -> _void))
+        -> _cpBool
+        
+        ;Making this non-void too (because it fixed post-solve)
+        ;_void
+        
+        ))
 
 
 (define-cstruct _cpCollisionHandler 
   (
    [typeA _cpCollisionType]
    [typeB _cpCollisionType]
-   [cpCollisionBeginFunc _cpCollisionBeginFunc]
-   [cpCollisionPreSolveFunc _cpCollisionPreSolveFunc]
+
+   ;This was my "fix" before mflatt's suggestion above.
+   ;[dummy     _cpBool] 
+
+   [cpCollisionBeginFunc     _cpCollisionBeginFunc]
+   [cpCollisionPreSolveFunc  _cpCollisionPreSolveFunc]
    [cpCollisionPostSolveFunc _cpCollisionPostSolveFunc]
-   [cpCollisionSeparateFunc _cpCollisionSeparateFunc]
-   [cpDataPointer _cpDataPointer]))
+   [cpCollisionSeparateFunc  _cpCollisionSeparateFunc]
+
+   [cpDataPointer            _cpDataPointer]))
 
 
 
@@ -321,6 +358,10 @@
 (define-chipmunk cpSpaceAddDefaultCollisionHandler
   (_fun _cpSpace-pointer
         -> _cpCollisionHandler-pointer))
+
+;cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
+(define-chipmunk cpSpaceAddCollisionHandler
+ (_fun _cpSpace-pointer _cpCollisionType _cpCollisionType -> _cpCollisionHandler-pointer)) 
  
 
 (define-chipmunk cpBodySetUserData
@@ -341,6 +382,9 @@
         (out2 : (_ptr o _cpShape-pointer))
         -> _void
         -> (values out1 out2)))
+
+(define-chipmunk cpArbiterIsFirstContact
+  (_fun _cpArbiter-pointer -> _cpBool))
 
 (define-chipmunk cpShapeGetUserData
   (_fun _cpShape-pointer -> _cpDataPointer))
