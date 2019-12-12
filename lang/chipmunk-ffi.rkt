@@ -389,11 +389,8 @@
 (define-chipmunk cpShapeGetUserData
   (_fun _cpShape-pointer -> _cpDataPointer))
 
-
 (define-chipmunk cpBodyGetUserData
   (_fun _cpBody-pointer -> _cpDataPointer))
-
-
 
 (define-chipmunk cpShapeDestroy
   (_fun _cpShape-pointer -> _void))

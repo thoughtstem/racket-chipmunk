@@ -1,11 +1,17 @@
 #lang racket
 
+;NOTE: This API is old and broken.  The game-engine package manages to use it (somehow), so I'm leaving it here until we can write a clearer, less-buggy API.
+;      For anyone else, though, I would recommend using the ffi directly (and building abstractions on top of that).
+
+; ~Stephen (Dec 2019)
+
 (provide step-chipmunk
          angle
          box 
          box-kinematic
          box-static
-         ;*space  ;Uhh.  No...
+         current-space
+         current-handler
          x y w h
          (struct-out chipmunk) 
          set-velocity! 
@@ -20,7 +26,8 @@
          set-chipmunk-posn!
          destroyed-chipmunk?
          body->data
-         )  
+         all-chipmunks
+         has-shape?)  
 
 (require ffi/unsafe) 
   
@@ -48,10 +55,16 @@
 (define *space
   (cpSpaceNew))
 
+(define (current-space)
+  *space)
+
 (cpSpaceSetGravity *space *gravity)
 
 (define handler
   (cpSpaceAddDefaultCollisionHandler *space))
+
+(define (current-handler)
+  handler)
 
 
 
@@ -161,9 +174,9 @@
 
 
 ;(set-cpCollisionHandler-cpCollisionBeginFunc!    handler main-begin)
-(set-cpCollisionHandler-cpCollisionPreSolveFunc! handler main-presolve)
+;(set-cpCollisionHandler-cpCollisionPreSolveFunc! handler main-presolve)
 ;(set-cpCollisionHandler-cpCollisionPostSolveFunc! handler main-postsolve)
-(set-cpCollisionHandler-cpCollisionSeparateFunc! handler main-separate)
+;(set-cpCollisionHandler-cpCollisionSeparateFunc! handler main-separate)
 
 
 
